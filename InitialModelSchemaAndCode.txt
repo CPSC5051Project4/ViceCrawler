@@ -21,7 +21,7 @@ sessionDate {
 }
 
 
-// creates the database 
+// creates the database or switches to this database if already exists
 use vicedb
 
 // for creating the route locations collection, and ensuring _id as the index
@@ -56,6 +56,17 @@ db.routeLocation.remove({"wl_id": })
 
 
 // javascript for vice model and session model
+
+// Retrieve
+var MongoClient = require('mongodb').MongoClient;
+
+// Connect to the db
+MongoClient.connect("mongodb://localhost:3000/vicedb", function(err,db) {
+	if (err) {
+		// error occured
+		exit;
+	}
+});
 
 
 // function for inserting route locations into database
