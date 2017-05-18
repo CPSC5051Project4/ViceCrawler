@@ -60,11 +60,10 @@ db.routeLocation.remove({"wl_id": })
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
 
-// Connect to the db
+// Connect to the db (not sure of the actual path to the database)
 MongoClient.connect("mongodb://localhost:3000/vicedb", function(err,db) {
 	if (err) {
 		// error occured
-		exit;
 	}
 });
 
