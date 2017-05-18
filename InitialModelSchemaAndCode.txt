@@ -1,0 +1,111 @@
+
+// Schema for route locations collection
+routeLocation {
+	_id: 'Mongo generated',
+	wl_id : String,
+	wl_is_valid: Char,
+	location: String or whatever data type is most appropriate 'GoogleMap API unique identifier'
+}
+
+// Schema for session data schema
+sessionDate {
+	_id : 'Mongo generated',
+	wl_id: String,
+	wl_context_path: String'
+	wl_is_new: Char,
+	wl_create_time: Timestamp,
+	wl_is_valid: Char,
+	wl_session_values:Binary data ,
+	wl_access_time: Timestamp,
+	wl_max_inactive_interval: Integer
+}
+
+
+// creates the database 
+use vicedb
+
+// for creating the route locations collection, and ensuring _id as the index
+db.createCollection(routeLocation, { capped : true, autoIndexId : true, size : 6142800, max : 10000 })
+db.routeLocation.ensureIndex({"_id":1})
+
+// for creating the session date collection, and ensuring _id as the index
+db.createCollection(sessionData, { capped : true, autoIndexId : true, size : 6142800, max : 10000 })
+db.sessionDate.ensureIndex({"_id":1})
+
+
+
+// For updating the session valid bit when session becomes invalid (probably won't need this for our project)
+
+db.routeLocation.update({"wl_id": }, {$set:{"wl_is_valid":0}}, {multi:true")
+
+db.sessionData.update({"wl_id": }, {$set:{"wl_is_valid":0}})
+
+
+
+// For cleaning up session model and vice model when a session is no longer valid (probably won't need this for our project)
+
+db.sessionData.find({"wl_is_valid":0}, {"_id":0, "wl_id":1})
+
+-> results from above
+
+db.sessionData.remove({"wl_id": })
+
+db.routeLocation.remove({"wl_id": })
+
+
+
+
+// javascript for vice model and session model
+
+
+// function for inserting route locations into database
+// to be used by the vice controller
+// requires session_id and is_valid
+
+function insertIntoRouteLocation(locations, session_id, is_valid) {
+	for each (loc in locations) {
+		db.routeLocation.insert({
+		wl_id : session_id,
+		wl_is_valid: session_is_valid,
+		location: loc });
+	}
+}
+
+
+//function for inserting session data into database
+// to be used by the session controller
+// requires session data values
+
+function insertIntoSessionData(session_id, path, is_new, create_time, is_valid, values, access_time, max_inactive) {
+	db.sessionData.insert({
+		wl_id: session_id,
+		wl_context_path: path,
+		wl_is_new: is_new,
+		wl_create_time: create_time,
+		wl_is_valid: is_valid,
+		wl_session_values: values,
+		wl_access_time: access_time,
+		wl_max_inactive_interval: max_inactive
+	});
+}	
+
+// function for querying and returning the list of locations in the database
+// to be used by the vice controller
+// requires session_id
+// returns the results as an array 
+
+function getRouteLocations(session_id) {
+	return db.routeLocation.find({"wl_id": session_id}, {"location":1, _id:0}).toArray();
+}
+
+
+// function for deleting a location from the route list in the database
+// to be used by the vice controller
+// requires session_id and the location to delete
+
+function removeLocation(session_id, loc) {
+	db.routeLocation.remove({
+		$and: [
+			{"wl_id": session_id}, {"location": loc}]
+	});
+}
