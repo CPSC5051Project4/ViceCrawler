@@ -2,8 +2,9 @@ Meteor.methods({
 	'newRequest' : function(input) {
 		var api = initializeApiView();
 		var model = initializeViceModel();
-		var request = { city: input.city, 
-			range: input.range, type: input.requestType };;
+		var request = { searchLocation: input.searchLocation,
+			maxWaypoints: input.maxWaypoints searchRadius: input.searchRadius, 
+			viceType: input.viceType };;
 		return apiRequest(model, api, request);
 	}
 	'addRequest' : function(input) {
